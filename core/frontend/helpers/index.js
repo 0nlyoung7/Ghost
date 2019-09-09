@@ -27,6 +27,7 @@ coreHelpers.link_class = require('./link_class');
 coreHelpers.meta_description = require('./meta_description');
 coreHelpers.meta_title = require('./meta_title');
 coreHelpers.navigation = require('./navigation');
+coreHelpers.sidemenu = require('./sidemenu');
 coreHelpers.page_url = require('./page_url');
 coreHelpers.pagination = require('./pagination');
 coreHelpers.plural = require('./plural');
@@ -62,6 +63,7 @@ registerAllCoreHelpers = function registerAllCoreHelpers() {
     registerThemeHelper('meta_description', coreHelpers.meta_description);
     registerThemeHelper('meta_title', coreHelpers.meta_title);
     registerThemeHelper('navigation', coreHelpers.navigation);
+    registerThemeHelper('sidemenu', coreHelpers.sidemenu);
     registerThemeHelper('page_url', coreHelpers.page_url);
     registerThemeHelper('pagination', coreHelpers.pagination);
     registerThemeHelper('plural', coreHelpers.plural);

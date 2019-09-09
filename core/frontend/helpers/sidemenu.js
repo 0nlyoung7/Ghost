@@ -1,6 +1,6 @@
 // ### Navigation Helper
-// `{{navigation}}`
-// Outputs navigation menu of static urls
+// `{{sidemenu}}`
+// Outputs sidemenu menu of static urls
 
 var proxy = require('./proxy'),
     string = require('../../server/lib/security/string'),
@@ -11,38 +11,36 @@ var proxy = require('./proxy'),
     errors = proxy.errors,
     templates = proxy.templates;
 
-module.exports = function navigation(options) {
+var menuData = require('../data/menu').data;
+
+module.exports = function sidemenu(options) {
     options = options || {};
     options.hash = options.hash || {};
     options.data = options.data || {};
 
-    var navigationData = options.data.blog.navigation,
-        currentUrl = options.data.root.relativeUrl,
+    var currentUrl = options.data.root.relativeUrl,
         self = this,
         output;
 
-    if (!_.isObject(navigationData) || _.isFunction(navigationData)) {
-        throw new errors.IncorrectUsageError({
-            message: i18n.t('warnings.helpers.navigation.invalidData')
-        });
+    var currentGroup = _getGroup(currentUrl) || [];
+    var sidemenuData = menuData[currentGroup];
+
+    if (!_.isObject(sidemenuData) || _.isFunction(sidemenuData)) {
+      return;
     }
 
-    if (navigationData.filter(function (e) {
+    if (sidemenuData.filter(function (e) {
         return (_.isUndefined(e.label) || _.isUndefined(e.url));
     }).length > 0) {
-        throw new errors.IncorrectUsageError({
-            message: i18n.t('warnings.helpers.navigation.valuesMustBeDefined')
-        });
+      return;
     }
 
     // check for non-null string values
-    if (navigationData.filter(function (e) {
+    if (sidemenuData.filter(function (e) {
         return ((!_.isNull(e.label) && !_.isString(e.label)) ||
             (!_.isNull(e.url) && !_.isString(e.url)));
     }).length > 0) {
-        throw new errors.IncorrectUsageError({
-            message: i18n.t('warnings.helpers.navigation.valuesMustBeString')
-        });
+      return;
     }
 
     function _slugify(label) {
@@ -65,12 +63,12 @@ module.exports = function navigation(options) {
       return temp.substring(0, temp.indexOf("/"));
     }
 
-    // {{navigation}} should no-op if no data passed in
-    if (navigationData.length === 0) {
+    // {{sidemenu}} should no-op if no data passed in
+    if (sidemenuData.length === 0) {
         return new SafeString('');
     }
 
-    output = navigationData.map(function (e) {
+    output = sidemenuData.map(function (e) {
         var out = {};
         out.current = _isCurrentUrl(e.url, currentUrl);
         out.label = e.label;
@@ -78,14 +76,25 @@ module.exports = function navigation(options) {
         out.url = e.url;
         out.secure = self.secure;
         out.group = _getGroup(e.url);
+        out.opened = (out.group === currentGroup);
+
+        if (e.childs) {
+          out.childs = e.childs.map(function (n) {
+            var node = {};
+            node.url = n.url;
+            node.label = n.label;
+            node.current = _isCurrentUrl(n.url, currentUrl);
+            return node;
+          });
+        }
+
         return out;
     });
 
-    // CASE: The navigation helper should have access to the navigation items at the top level.
-    this.navigation = output;
-    // CASE: The navigation helper will forward attributes passed to it.
+    // CASE: The sidemenu helper should have access to the sidemenu items at the top level.
+    this.sidemenu = output;
+    // CASE: The sidemenu helper will forward attributes passed to it.
     _.merge(this, options.hash);
     const data = createFrame(options.data);
-
-    return templates.execute('navigation', this, {data});
+    return templates.execute('sidemenu', this, {data});
 };
