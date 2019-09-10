@@ -66,8 +66,10 @@ module.exports = function collectionController(req, res, next) {
              * People should always invert their filters to ensure that the database query loads unique posts per collection.
              */
             result.posts = _.filter(result.posts, (post) => {
-                if (urlService.owns(res.routerOptions.identifier, post.id)) {
-                    return post;
+                if (res.routerOptions.filter === undefined) {
+                  return post;
+                } else if (urlService.owns(res.routerOptions.identifier, post.id)) {
+                  return post;
                 }
 
                 debug(`'${post.slug}' is not owned by this collection`);
