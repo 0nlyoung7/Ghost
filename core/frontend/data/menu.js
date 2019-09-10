@@ -152,7 +152,7 @@ var data = {
   "guides": [
     {
       "label": "Image Guide",
-      "url": "/docs/guides/image",
+      "url": "/docs/guides/image-guide",
       "childs": [
         {
           "label": "상품 대표 이미지 - 550 x 550",
